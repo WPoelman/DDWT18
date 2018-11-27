@@ -43,8 +43,13 @@
                             <th scope="row">Number of seasons</th>
                             <td><?= $nbr_seasons ?></td>
                         </tr>
+                        <tr>
+                            <th scope="row">Added by user</th>
+                            <td><?=$added_by['firstname']?> <?=$added_by['lastname']?></td>
+                        </tr>
                         </tbody>
                     </table>
+                    <?php if($display_buttons) { ?>
                     <div class="row">
                         <div class="col-sm-2">
                             <a href="/DDWT18/week2/edit/?serie_id=<?= $serie_id ?>" role="button" class="btn btn-warning">Edit</a>
@@ -56,7 +61,7 @@
                             </form>
                         </div>
                     </div>
-
+                    <?php } ?>
                 </div>
 
                 <!-- Right column -->
