@@ -19,18 +19,19 @@ error_reporting(E_ALL);
  * @param string $pass database password
  * @return pdo object
  */
-function connect_db($host, $db, $user, $pass){
+function connect_db($host, $db, $user, $pass)
+{
     $charset = 'utf8mb4';
 
     $dsn = "mysql:host=$host;dbname=$db;charset=$charset";
     $options = [
-        PDO::ATTR_ERRMODE            => PDO::ERRMODE_EXCEPTION,
+        PDO::ATTR_ERRMODE => PDO::ERRMODE_EXCEPTION,
         PDO::ATTR_DEFAULT_FETCH_MODE => PDO::FETCH_ASSOC,
     ];
     try {
         $pdo = new PDO($dsn, $user, $pass, $options);
     } catch (\PDOException $e) {
-        echo sprintf("Failed to connect. %s",$e->getMessage());
+        echo sprintf("Failed to connect. %s", $e->getMessage());
     }
     return $pdo;
 }
@@ -39,7 +40,8 @@ function connect_db($host, $db, $user, $pass){
  * Pretty Print Array
  * @param $input
  */
-function p_print($input){
+function p_print($input)
+{
     echo '<pre>';
     print_r($input);
     echo '</pre>';
@@ -50,7 +52,8 @@ function p_print($input){
  * @param object $pdo database object
  * @return array Associative array with all series
  */
-function get_series($pdo){
+function get_series($pdo)
+{
     $stmt = $pdo->prepare('SELECT * FROM series');
     $stmt->execute();
     $series = $stmt->fetchAll();
@@ -64,14 +67,15 @@ function get_series($pdo){
  * @param int $serie_id id from the serie
  * @return mixed
  */
-function get_serieinfo($pdo, $serie_id){
+function get_serieinfo($pdo, $serie_id)
+{
     $stmt = $pdo->prepare('SELECT * FROM series WHERE id = ?');
     $stmt->execute([$serie_id]);
     $serie_info = $stmt->fetch();
     $serie_info_exp = Array();
 
     /* Create array with htmlspecialchars */
-    foreach ($serie_info as $key => $value){
+    foreach ($serie_info as $key => $value) {
         $serie_info_exp[$key] = htmlspecialchars($value);
     }
     return $serie_info_exp;
@@ -83,7 +87,8 @@ function get_serieinfo($pdo, $serie_id){
  * @param array $serie_info post array
  * @return array with message feedback
  */
-function add_serie($pdo, $serie_info){
+function add_serie($pdo, $serie_info)
+{
     /* Check if all fields are set */
     if (
         empty($serie_info['Name']) or
@@ -109,7 +114,7 @@ function add_serie($pdo, $serie_info){
     $stmt = $pdo->prepare('SELECT * FROM series WHERE name = ?');
     $stmt->execute([$serie_info['Name']]);
     $serie = $stmt->rowCount();
-    if ($serie){
+    if ($serie) {
         return [
             'type' => 'danger',
             'message' => 'This series was already added.'
@@ -125,13 +130,12 @@ function add_serie($pdo, $serie_info){
         $serie_info['Abstract']
     ]);
     $inserted = $stmt->rowCount();
-    if ($inserted ==  1) {
+    if ($inserted == 1) {
         return [
             'type' => 'success',
             'message' => sprintf("Series '%s' added to Series Overview.", $serie_info['Name'])
         ];
-    }
-    else {
+    } else {
         return [
             'type' => 'danger',
             'message' => 'There was an error. The series was not added. Try it again.'
@@ -145,7 +149,8 @@ function add_serie($pdo, $serie_info){
  * @param array $serie_info post array
  * @return array
  */
-function update_serie($pdo, $serie_info){
+function update_serie($pdo, $serie_info)
+{
     /* Check if all fields are set */
     if (
         empty($serie_info['Name']) or
@@ -178,7 +183,7 @@ function update_serie($pdo, $serie_info){
     $stmt = $pdo->prepare('SELECT * FROM series WHERE name = ?');
     $stmt->execute([$serie_info['Name']]);
     $serie = $stmt->fetch();
-    if ($serie_info['Name'] == $serie['name'] and $serie['name'] != $current_name){
+    if ($serie_info['Name'] == $serie['name'] and $serie['name'] != $current_name) {
         return [
             'type' => 'danger',
             'message' => sprintf("The name of the series cannot be changed. %s already exists.", $serie_info['Name'])
@@ -195,13 +200,12 @@ function update_serie($pdo, $serie_info){
         $serie_info['serie_id']
     ]);
     $updated = $stmt->rowCount();
-    if ($updated ==  1) {
+    if ($updated == 1) {
         return [
             'type' => 'success',
             'message' => sprintf("Series '%s' was edited!", $serie_info['Name'])
         ];
-    }
-    else {
+    } else {
         return [
             'type' => 'warning',
             'message' => 'The series was not edited. No changes were detected'
@@ -215,7 +219,8 @@ function update_serie($pdo, $serie_info){
  * @param int $serie_id id of the to be deleted series
  * @return array
  */
-function remove_serie($pdo, $serie_id){
+function remove_serie($pdo, $serie_id)
+{
     /* Get series info */
     $serie_info = get_serieinfo($pdo, $serie_id);
 
@@ -223,13 +228,12 @@ function remove_serie($pdo, $serie_id){
     $stmt = $pdo->prepare("DELETE FROM series WHERE id = ?");
     $stmt->execute([$serie_id]);
     $deleted = $stmt->rowCount();
-    if ($deleted ==  1) {
+    if ($deleted == 1) {
         return [
             'type' => 'success',
             'message' => sprintf("Series '%s' was removed!", $serie_info['name'])
         ];
-    }
-    else {
+    } else {
         return [
             'type' => 'warning',
             'message' => 'An error occurred. The series was not removed.'
@@ -242,7 +246,8 @@ function remove_serie($pdo, $serie_id){
  * @param PDO $pdo database object
  * @return mixed
  */
-function count_series($pdo){
+function count_series($pdo)
+{
     /* Get series */
     $stmt = $pdo->prepare('SELECT * FROM series');
     $stmt->execute();
@@ -254,7 +259,50 @@ function count_series($pdo){
  * Changes the HTTP Header to a given location
  * @param string $location location to be redirected to
  */
-function redirect($location){
+function redirect($location)
+{
     header(sprintf('Location: %s', $location));
     die();
+}
+
+/**
+ * Changes the HTTP content type
+ * @param string $type type to change to
+ */
+function http_content_type($type){
+    header(sprintf('Content-Type: %s', $type));
+}
+
+/**
+ * Returns credentials based on username and password
+ * @param string $username
+ * @param string $password
+ * @return array with username and password
+ */
+function set_cred($username, $password)
+{
+    return [
+        'username' => $username,
+        'password' => $password
+    ];
+}
+
+/**
+ * Checks if credentials match and are set
+ * @param array $cred array with credentials
+ * @return bool True if it matches, False if they don't
+ */
+function check_cred($cred)
+{
+    if (!isset($_SERVER['PHP_AUTH_USER'])) {
+        return False;
+    } else {
+        if ($_SERVER['PHP_AUTH_USER'] != $cred['username']) {
+            return False;
+        } elseif ($_SERVER['PHP_AUTH_PW'] != $cred['password']) {
+            return False;
+        } else {
+            return True;
+        }
+    }
 }

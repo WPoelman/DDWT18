@@ -1,0 +1,15 @@
+{
+  "name": "WPoelman/DDWT18_week3",
+  "description": " ",
+  "minimum-stability": "stable",
+  "license": "proprietary",
+  "authors": [
+    {
+      "name": "Wessel Poelman",
+      "email": "w.g.poelman@student.rug.nl"
+    }
+  ],
+  "require": {
+    "bramus/router": "1.3"
+  }
+}
